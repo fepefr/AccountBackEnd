@@ -1,7 +1,8 @@
 package com.revolut.model;
 
 public class Account {
-	private String num;
+	private Long id;
+	private String number;
 	private Number balance;
 	private Client client;
 	
@@ -17,11 +18,11 @@ public class Account {
 	public void setClient(Client client) {
 		this.client = client;
 	}
-	public String getNum() {
-		return num;
+	public String getNumber() {
+		return number;
 	}
-	public void setNum(String num) {
-		this.num = num;
+	public void setNumber(String num) {
+		this.number = num;
 	}
 	public void debt() {
 		// TODO Auto-generated method stub
@@ -30,5 +31,15 @@ public class Account {
 	public void credit() {
 		// TODO Auto-generated method stub
 		
+	}
+	public Long getId() {
+		return id;
+	}
+	public void setId(Long id) {
+		this.id = id;
+	}
+	@Override
+	public String toString() {
+		return "Account [id ="+ id + "num=" + number + ", balance=" + balance + ", client=" + client + "]";
 	}
 }

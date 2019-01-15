@@ -1,7 +1,7 @@
 package com.revolut.model;
 
 public class Client {
-	private Long num;
+	private Long id;
 	private String name;
 	private String address;
 	
@@ -17,11 +17,15 @@ public class Client {
 	public void setAddress(String address) {
 		this.address = address;
 	}
-	public Long getNum() {
-		return num;
+	public Long getId() {
+		return id;
 	}
-	public void setNum(Long num) {
-		this.num = num;
+	public void setId(Long id) {
+		this.id = id;
+	}
+	@Override
+	public String toString() {
+		return "Client [id=" + id + ", name=" + name + ", address=" + address + "]";
 	}
 	
 }

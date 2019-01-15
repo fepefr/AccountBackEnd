@@ -18,6 +18,7 @@ import javax.ws.rs.core.Response;
 
 import com.revolut.model.Account;
 import com.revolut.model.Bank;
+import com.revolut.vo.Accounts;
 
 @Singleton
 @Path("v1/accounts")
@@ -36,8 +37,9 @@ public class AccountsResource{
 	
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
-	public List<Account> searchAll() {
-		List<Account> accounts = bank.getAccounts();
+	public Accounts searchAll() {
+		Accounts accounts = new Accounts();
+		accounts.setAccountList(bank.getAccounts());
 	    return accounts;
 	}
 	
@@ -45,7 +47,7 @@ public class AccountsResource{
 	@Consumes(MediaType.APPLICATION_JSON)
 	 public Response add(Account account) {
         bank.addAccount(account);
-        URI uri = URI.create("/accounts/" + account.getNum());
+        URI uri = URI.create("/accounts/" + account.getNumber());
         return Response.created(uri).build();
     }
 
