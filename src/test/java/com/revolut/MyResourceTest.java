@@ -3,8 +3,6 @@ package com.revolut;
 import static org.junit.Assert.assertEquals;
 
 import java.math.BigDecimal;
-import java.nio.charset.Charset;
-import java.util.Random;
 
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.client.WebTarget;
@@ -23,7 +21,8 @@ import com.revolut.vo.Accounts;
 
 public class MyResourceTest {
 
-    private HttpServer server;
+    private static final String ACCOUNTS_API = "v1/accounts";
+	private HttpServer server;
     private WebTarget target;
 
     @Before
@@ -44,7 +43,7 @@ public class MyResourceTest {
 
     @After
     public void tearDown() throws Exception {
-        server.stop();
+        server.shutdownNow();
     }
   
     @Test
@@ -54,17 +53,17 @@ public class MyResourceTest {
     		Account account = new Account();
     		//usar AtomicLong
     		account.setId(i);
-    		//account.setNumber(generatingRandomString());
+    		account.setNumber("AN"+i);
     		account.setBalance(new BigDecimal(i*100));
     		Client client = new Client();
     		client.setName("Client Name "+i);
     		client.setAddress("Adress "+i);
     		client.setId(i);
 			account.setClient(client);
-    		resp = target.path("v1/accounts").request().post(Entity.entity(account, MediaType.APPLICATION_JSON));
+    		resp = target.path(ACCOUNTS_API).request().post(Entity.entity(account, MediaType.APPLICATION_JSON));
     		assertEquals(HttpStatus.CREATED_201.getStatusCode(), resp.getStatusInfo().getStatusCode());			
 		}    	
-        resp = target.path("v1/accounts").request().get();
+        resp = target.path(ACCOUNTS_API).request().get();
         Accounts accounts = resp.readEntity(Accounts.class);  
         for (Account account : accounts.getAccountList()) {
         	System.out.println(account.toString());
@@ -72,13 +71,7 @@ public class MyResourceTest {
         assertEquals(accounts.getAccountList().size(), 10);
     }
     
-    private String generatingRandomString() {
-        byte[] array = new byte[7]; // length is bounded by 7
-        new Random().nextBytes(array);
-        String generatedString = new String(array, Charset.forName("UTF-8"));
-        System.out.println(generatedString);
-		return generatedString;
-    }
+
     
 
     

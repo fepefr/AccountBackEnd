@@ -1,7 +1,7 @@
 package com.revolut.resource;
 
 import java.net.URI;
-import java.util.List;
+import java.util.ArrayList;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -28,19 +28,19 @@ public class AccountsResource{
 
 	
 	@GET
-	@Path("{accountNum}")
+	@Path("{id}")
 	@Produces(MediaType.APPLICATION_JSON)
-	public Account search(@PathParam("accountNum") Long accountNum) {
-		Account account = bank.searchAccount(accountNum);
+	public Account get(@PathParam("id") Long id) {
+		Account account = bank.getAccount(id);
 	    return account;
 	}
 	
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
-	public Accounts searchAll() {
-		Accounts accounts = new Accounts();
-		accounts.setAccountList(bank.getAccounts());
-	    return accounts;
+	public Accounts getAll() {
+		Accounts accountsWrapper= new Accounts();
+		accountsWrapper.setAccountList(new ArrayList<Account>(bank.getAccounts().values()));
+	    return accountsWrapper;
 	}
 	
 	@POST
@@ -51,40 +51,31 @@ public class AccountsResource{
         return Response.created(uri).build();
     }
 
-	@Path("{accountNum}")
+	@Path("{id}")
 	@DELETE
-	public Response remove(@PathParam("accountNum") Long accountNum) {
-		bank.removeAccount(accountNum);
-		return Response.ok().build();
+	public Response remove(@PathParam("id") Long id) {
+		boolean isRemoved = bank.removeAccount(id);
+		Response resp = Response.status(202).build();
+		if(!isRemoved)
+			resp = Response.noContent().build();
+		return resp;
 	}
 	
     @PUT
-    @Path("{accountNum}/debit")
+    @Path("{id}/debit")
     @Produces(MediaType.APPLICATION_JSON)
-    public String debt(@PathParam("accountNum") Long accountNum, Number value) {
-    	Account account = bank.searchAccount(accountNum);
-    	account.debt();
-        return "Got it!";
+    public Response debt(@PathParam("id") Long id, Number value) {
+    	Account account = bank.getAccount(id);
+    	Number balance = account.debt(value);
+    	return Response.ok().entity(balance).build();
     }
     
     @PUT
-    @Path("{accountNum}/debt")
+    @Path("{id}/credit")
     @Produces(MediaType.APPLICATION_JSON)
-    public String credit(@PathParam("accountNum") Long accountNum, Number value) {
-    	Account account = bank.searchAccount(accountNum);
-    	account.credit();
-        return "Got it!";
-    }
-
-    /**
-     * Method handling HTTP GET requests. The returned object will be sent
-     * to the client as "text/plain" media type.
-     *
-     * @return String that will be returned as a text/plain response.
-     */
-    @GET
-    @Produces(MediaType.TEXT_PLAIN)
-    public String getIt() {
-        return "Got it!";
+    public Response credit(@PathParam("id") Long id, Number value) {
+    	Account account = bank.getAccount(id);
+    	Number balance = account.credit(value);
+    	return Response.ok().entity(balance).build();
     }
 }

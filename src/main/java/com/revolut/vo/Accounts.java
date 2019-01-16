@@ -1,6 +1,7 @@
 package com.revolut.vo;
 
 import java.util.List;
+
 import com.revolut.model.Account;
 
 public class Accounts {
@@ -13,4 +14,6 @@ public class Accounts {
 	public void setAccountList(List<Account> accountList) {
 		this.accountList = accountList;
 	}
+
+
 }

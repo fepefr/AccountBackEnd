@@ -1,5 +1,7 @@
 package com.revolut.model;
 
+import java.math.BigDecimal;
+
 public class Account {
 	private Long id;
 	private String number;
@@ -24,13 +26,13 @@ public class Account {
 	public void setNumber(String num) {
 		this.number = num;
 	}
-	public void debt() {
-		// TODO Auto-generated method stub
-		
+	public Number debt(Number value) {
+		this.balance = new BigDecimal(balance.toString()).subtract( new BigDecimal(value.toString()));
+		return this.balance;
 	}
-	public void credit() {
-		// TODO Auto-generated method stub
-		
+	public Number credit(Number value) {
+		this.balance = new BigDecimal(balance.toString()).add( new BigDecimal(value.toString()));
+		return this.balance;		
 	}
 	public Long getId() {
 		return id;

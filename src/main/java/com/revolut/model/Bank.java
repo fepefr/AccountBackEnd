@@ -1,40 +1,33 @@
 package com.revolut.model;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.enterprise.context.ApplicationScoped;
 @ApplicationScoped
 public class Bank {
-	private List<Client> clients;
-	private List<Account> accounts;
+	private Map<Long, Account> accounts;
 
-	public List<Client> getClients() {
-		return clients;
+	public Bank() {
+		super();
+		this.accounts = new HashMap<Long, Account>();
 	}
-	public void setClients(List<Client> clients) {
-		this.clients = clients;
-	}
-	public List<Account> getAccounts() {
+
+	public Map<Long, Account> getAccounts() {
 		return accounts;
 	}
-	public void setAccounts(List<Account> accounts) {
+	public void setAccounts(Map<Long, Account> accounts) {
 		this.accounts = accounts;
 	}
 	
     public void addAccount(Account account) {
-    	if(this.accounts == null) accounts = new ArrayList<Account>();
-    	this.accounts.add(account);
+    	this.accounts.put(account.getId(),account);
     }
     
-    public void addClient(Client client) {
-    	if(this.clients == null) clients = new ArrayList<Client>();
-    	this.clients.add(client);
-    }
-	public Account searchAccount(Long accountNum) {
-		return null;
+	public Account getAccount(Long accountId) {
+		return this.accounts.get(accountId);
 	}
-	public void removeAccount(Long accountNum) {
-		// TODO Auto-generated method stub
+	public boolean removeAccount(Long accountId) {
+		return (this.accounts.remove(accountId)==null)?false:true;
 	}
 }
