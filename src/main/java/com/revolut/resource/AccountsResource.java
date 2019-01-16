@@ -2,6 +2,7 @@ package com.revolut.resource;
 
 import java.net.URI;
 import java.util.ArrayList;
+import java.util.Random;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -21,14 +22,14 @@ import com.revolut.model.Bank;
 import com.revolut.vo.Accounts;
 
 @Singleton
-@Path("v1/accounts")
+@Path("accounts")
 public class AccountsResource{
 	@Inject
 	private Bank bank;
 
 	
 	@GET
-	@Path("{id}")
+	@Path("/{id}")
 	@Produces(MediaType.APPLICATION_JSON)
 	public Account get(@PathParam("id") Long id) {
 		Account account = bank.getAccount(id);
@@ -46,8 +47,9 @@ public class AccountsResource{
 	@POST
 	@Consumes(MediaType.APPLICATION_JSON)
 	 public Response add(Account account) {
+		account.setId(new Random().nextLong());
         bank.addAccount(account);
-        URI uri = URI.create("/accounts/" + account.getNumber());
+        URI uri = URI.create("/accounts/" + account.getId());
         return Response.created(uri).build();
     }
 

@@ -3,6 +3,7 @@ package com.revolut;
 import static org.junit.Assert.assertEquals;
 
 import java.math.BigDecimal;
+import java.net.URI;
 
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.client.WebTarget;
@@ -21,7 +22,7 @@ import com.revolut.vo.Accounts;
 
 public class MyResourceTest {
 
-    private static final String ACCOUNTS_API = "v1/accounts";
+    private static final String ACCOUNTS_API = "accounts";
 	private HttpServer server;
     private WebTarget target;
 
@@ -50,6 +51,44 @@ public class MyResourceTest {
     public void testCreateAccounts() {
     	Response resp = null;
     	for (Long i = 0L; i < 10; i++) {
+    		Account account = buildAccount(i);
+    		resp = target.path(ACCOUNTS_API).request().post(Entity.entity(account, MediaType.APPLICATION_JSON));
+    		assertEquals(HttpStatus.CREATED_201.getStatusCode(), resp.getStatusInfo().getStatusCode());
+    		URI accountUri = resp.getLocation();
+    		resp = target.path(accountUri.getPath()).request().get();
+    		assertEquals(HttpStatus.OK_200.getStatusCode(), resp.getStatusInfo().getStatusCode());
+    		Account accountRetrieved = resp.readEntity(Account.class);
+    		assertEquals(accountRetrieved.getNumber(), account.getNumber());
+		}    	
+    	resp = target.path(ACCOUNTS_API).request().get();
+    	assertEquals(HttpStatus.OK_200.getStatusCode(), resp.getStatusInfo().getStatusCode());
+    	Accounts accounts = resp.readEntity(Accounts.class);  
+        assertEquals(accounts.getAccountList().size(), 10);
+        
+        
+        //resp = target.path(ACCOUNTS_API).request().get();
+    	//assertEquals(HttpStatus.OK_200.getStatusCode(), resp.getStatusInfo().getStatusCode());
+    //	Accounts accounts = resp.readEntity(Accounts.class);  
+      //  assertEquals(accounts.getAccountList().size(), 10);
+    }
+    
+    private Account buildAccount(Long index) {
+    	Account account = new Account();
+		//account.setId(index);
+		account.setNumber("AN"+index);
+		account.setBalance(new BigDecimal(index*100));
+		Client client = new Client();
+		client.setName("Client Name "+index);
+		client.setAddress("Adress "+index);
+		client.setId(index);
+		account.setClient(client);
+		return account;
+    }
+    
+/*    @Test
+    public void testCreateAccounts() {
+    	Response resp = null;
+    	for (Long i = 0L; i < 10; i++) {
     		Account account = new Account();
     		//usar AtomicLong
     		account.setId(i);
@@ -69,7 +108,7 @@ public class MyResourceTest {
         	System.out.println(account.toString());
 		}
         assertEquals(accounts.getAccountList().size(), 10);
-    }
+    }*/
     
 
     
