@@ -42,6 +42,6 @@ public class Account {
 	}
 	@Override
 	public String toString() {
-		return "Account [id ="+ id + "num=" + number + ", balance=" + balance + ", client=" + client + "]";
+		return "Account [id ="+ id + ", num=" + number + ", balance=" + balance + ", client=" + client + "]";
 	}
 }

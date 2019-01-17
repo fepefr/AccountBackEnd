@@ -4,6 +4,7 @@ import static org.junit.Assert.assertEquals;
 
 import java.math.BigDecimal;
 import java.net.URI;
+import java.util.List;
 
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.client.WebTarget;
@@ -51,25 +52,60 @@ public class MyResourceTest {
     public void testCreateAccounts() {
     	Response resp = null;
     	for (Long i = 0L; i < 10; i++) {
+    		//Create test
     		Account account = buildAccount(i);
     		resp = target.path(ACCOUNTS_API).request().post(Entity.entity(account, MediaType.APPLICATION_JSON));
     		assertEquals(HttpStatus.CREATED_201.getStatusCode(), resp.getStatusInfo().getStatusCode());
+    		//Retrieve test
     		URI accountUri = resp.getLocation();
     		resp = target.path(accountUri.getPath()).request().get();
     		assertEquals(HttpStatus.OK_200.getStatusCode(), resp.getStatusInfo().getStatusCode());
     		Account accountRetrieved = resp.readEntity(Account.class);
+    		System.out.println(accountRetrieved.toString());
     		assertEquals(accountRetrieved.getNumber(), account.getNumber());
-		}    	
+		}    
+    	
+    	//Retrieve all test
     	resp = target.path(ACCOUNTS_API).request().get();
     	assertEquals(HttpStatus.OK_200.getStatusCode(), resp.getStatusInfo().getStatusCode());
     	Accounts accounts = resp.readEntity(Accounts.class);  
-        assertEquals(accounts.getAccountList().size(), 10);
-        
-        
-        //resp = target.path(ACCOUNTS_API).request().get();
-    	//assertEquals(HttpStatus.OK_200.getStatusCode(), resp.getStatusInfo().getStatusCode());
-    //	Accounts accounts = resp.readEntity(Accounts.class);  
-      //  assertEquals(accounts.getAccountList().size(), 10);
+        List<Account> accountList = accounts.getAccountList();
+		assertEquals(accountList.size(), 10);
+		for (Account account : accountList) {
+			//Credit test
+			Number initBalance = account.getBalance();
+			//Calculate 10% from account balance
+			Number value = calculatePercentage(10D,initBalance);
+			account.credit(value);
+			resp = target.path(ACCOUNTS_API).path(account.getId().toString()).path("/credit").
+					request().put(Entity.entity(value, MediaType.APPLICATION_JSON));
+			assertEquals(HttpStatus.OK_200.getStatusCode(), resp.getStatusInfo().getStatusCode());
+			Number newBalance = resp.readEntity(Number.class);
+			assertEquals(account.getBalance(), newBalance);
+		
+			//Debt test
+			initBalance = account.getBalance();
+			//value = calculatePercentage(10D,initBalance);
+			account.debt(value);
+			resp = target.path(ACCOUNTS_API).path(account.getId().toString()).path("/debt").
+					request().put(Entity.entity(value, MediaType.APPLICATION_JSON));
+			assertEquals(HttpStatus.OK_200.getStatusCode(), resp.getStatusInfo().getStatusCode());
+			newBalance = resp.readEntity(Number.class);
+			assertEquals(account.getBalance(), newBalance);
+		}
+		
+		//Delete test
+		for (Account account : accountList) {
+			System.out.println(account.toString());
+        	resp = target.path(ACCOUNTS_API).path(account.getId().toString()).request().delete();
+        	assertEquals(HttpStatus.ACCEPTED_202.getStatusCode(), resp.getStatusInfo().getStatusCode());
+        	resp = target.path(ACCOUNTS_API).path(account.getId().toString()).request().delete();
+        	assertEquals(HttpStatus.NO_CONTENT_204.getStatusCode(), resp.getStatusInfo().getStatusCode());
+		}
+    }
+    
+    private Number calculatePercentage(Number value, Number perc) {
+        return (value.doubleValue() * perc.doubleValue()) / 100;
     }
     
     private Account buildAccount(Long index) {
@@ -84,41 +120,4 @@ public class MyResourceTest {
 		account.setClient(client);
 		return account;
     }
-    
-/*    @Test
-    public void testCreateAccounts() {
-    	Response resp = null;
-    	for (Long i = 0L; i < 10; i++) {
-    		Account account = new Account();
-    		//usar AtomicLong
-    		account.setId(i);
-    		account.setNumber("AN"+i);
-    		account.setBalance(new BigDecimal(i*100));
-    		Client client = new Client();
-    		client.setName("Client Name "+i);
-    		client.setAddress("Adress "+i);
-    		client.setId(i);
-			account.setClient(client);
-    		resp = target.path(ACCOUNTS_API).request().post(Entity.entity(account, MediaType.APPLICATION_JSON));
-    		assertEquals(HttpStatus.CREATED_201.getStatusCode(), resp.getStatusInfo().getStatusCode());			
-		}    	
-        resp = target.path(ACCOUNTS_API).request().get();
-        Accounts accounts = resp.readEntity(Accounts.class);  
-        for (Account account : accounts.getAccountList()) {
-        	System.out.println(account.toString());
-		}
-        assertEquals(accounts.getAccountList().size(), 10);
-    }*/
-    
-
-    
-
-    
-	/*
-	 * @Test public void testContent() { Response resp =
-	 * target.path("v1/accounts").request().get(); List readEntity =
-	 * resp.readEntity(List.class);
-	 * assertEquals(HttpStatus.NO_CONTENT_204.getStatusCode(), resp.getStatus()); }
-	 */
-    
 }

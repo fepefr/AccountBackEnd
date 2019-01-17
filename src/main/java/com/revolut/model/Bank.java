@@ -1,6 +1,6 @@
 package com.revolut.model;
 
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 import javax.enterprise.context.ApplicationScoped;
@@ -10,7 +10,7 @@ public class Bank {
 
 	public Bank() {
 		super();
-		this.accounts = new HashMap<Long, Account>();
+		this.accounts = new LinkedHashMap<Long, Account>();
 	}
 
 	public Map<Long, Account> getAccounts() {

@@ -26,10 +26,9 @@ import com.revolut.vo.Accounts;
 public class AccountsResource{
 	@Inject
 	private Bank bank;
-
 	
 	@GET
-	@Path("/{id}")
+	@Path("{id}")
 	@Produces(MediaType.APPLICATION_JSON)
 	public Account get(@PathParam("id") Long id) {
 		Account account = bank.getAccount(id);
@@ -64,7 +63,7 @@ public class AccountsResource{
 	}
 	
     @PUT
-    @Path("{id}/debit")
+    @Path("{id}/debt")
     @Produces(MediaType.APPLICATION_JSON)
     public Response debt(@PathParam("id") Long id, Number value) {
     	Account account = bank.getAccount(id);
