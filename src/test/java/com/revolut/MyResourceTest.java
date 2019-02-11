@@ -35,6 +35,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 import com.revolut.model.Account;
 import com.revolut.vo.Erro;
 import com.revolut.vo.TransferRequest;
+import com.revolut.vo.TransferResponse;
 
 @TestMethodOrder(OrderAnnotation.class)
 @TestInstance(Lifecycle.PER_CLASS)
@@ -47,17 +48,8 @@ public class MyResourceTest {
 
     @BeforeAll
     public void setUp() {
-        // start the server
         server = Main.startServer();
-        // create the client
         javax.ws.rs.client.Client c = javax.ws.rs.client.ClientBuilder.newClient();
-
-        // uncomment the following line if you want to enable
-        // support for JSON in the client (you also have to uncomment
-        // dependency on jersey-media-json module in pom.xml and Main.startServer())
-        // --
-        // c.configuration().enable(new org.glassfish.jersey.media.json.JsonJaxbFeature());
-
         target = c.target(Main.BASE_URI);
     }
 
@@ -91,12 +83,6 @@ public class MyResourceTest {
     void testRetrieveAccounts() {
     	Response resp = target.path(ACCOUNTS_API).request().get();
      	assertEquals(HttpStatus.OK_200.getStatusCode(), resp.getStatusInfo().getStatusCode());
-     	//@SuppressWarnings("unchecked")
-	//	Collection accounts =  resp.readEntity(Collection.class);  
-    // 	accounts.forEach( System.out::println);
-//     	List<Person> list = map.entrySet().stream().sorted(Map.Entry.comparingByKey())
-  //   			.map(e -> new Person(e.getKey(), e.getValue())).collect(Collectors.toList())
-        //assertEquals(accounts.size(), ACCOUNTS_SIZE);
     }
     
     @Test
@@ -144,29 +130,13 @@ public class MyResourceTest {
     		}
     	}else {
     		assertEquals(HttpStatus.OK_200.getStatusCode(), resp.getStatusInfo().getStatusCode());
-    	}    	
-    //	for (Account account : accountList) {
-			//Credit test
-			//Money initBalance = account.getBalance();
-			//Calculate 10% from account balance
-			//Number value = calculatePercentage(10D,initBalance);
-//			account.credit(value);
-//			resp = target.path(ACCOUNTS_API).path(account.getId().toString()).path("/credit").
-//					request().put(Entity.entity(value, MediaType.APPLICATION_JSON));
-//			assertEquals(HttpStatus.OK_200.getStatusCode(), resp.getStatusInfo().getStatusCode());
-//			Number newBalance = resp.readEntity(Number.class);
-//			assertEquals(account.getBalance(), newBalance);
-		
-			//Debt test
-			//initBalance = account.getBalance();
-			//value = calculatePercentage(10D,initBalance);
-			//account.debt(value);
-			//resp = target.path(ACCOUNTS_API).path(account.getNumber().toString()).path("/debt").
-				//	request().put(Entity.entity(value, MediaType.APPLICATION_JSON));
-			//assertEquals(HttpStatus.OK_200.getStatusCode(), resp.getStatusInfo().getStatusCode());
-			//newBalance = resp.readEntity(Number.class);
-			//assertEquals(account.getBalance(), newBalance);
-		//}
+    		TransferResponse transfResp = resp.readEntity(TransferResponse.class);
+    		Account accountFrom = transfResp.getAccountFrom();
+    		Account accountTo = transfResp.getAccountTo();
+    		
+    		assertEquals(acctFrom.getBalance(), accountFrom.getBalance().add(transRequest.getAmount()).add(transRequest.getFee())); 
+    		assertEquals(accountTo.getBalance(), acctTo.getBalance().add(transRequest.getAmount()));
+    	}     	
     }
 
 	private Account getRandomAccount(Random rnd) {
@@ -184,10 +154,8 @@ public class MyResourceTest {
 		}
 	}    
     
-    
     @AfterAll
     public void tearDown() throws Exception {
       server.shutdownNow();
     }    
-    
 }
