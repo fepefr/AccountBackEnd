@@ -21,13 +21,14 @@ public class Bank {
 	}
 	
     public void addAccount(Account account) {
-    	this.accounts.put(account.getId(),account);
+    	this.accounts.put(account.getNumber(),account);
     }
     
-	public Account getAccount(Long accountId) {
-		return this.accounts.get(accountId);
+	public Account getAccount(Long accountNum) {
+		return this.accounts.get(accountNum);
 	}
-	public boolean removeAccount(Long accountId) {
-		return (this.accounts.remove(accountId)==null)?false:true;
+	
+	public boolean removeAccount(Long accountNum) {
+		return (this.accounts.remove(accountNum)==null)?false:true;
 	}
 }

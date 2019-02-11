@@ -1,6 +1,5 @@
 package com.revolut.vo;
 
-//@JsonInclude(JsonInclude.Include.NON_NULL)
 public class FieldError {
 	private String code;
 	private String message;
@@ -9,6 +8,9 @@ public class FieldError {
 	public FieldError(String field2, String message2) {
 		this.message = message2;
 		field = field2;
+	}
+	public FieldError() {
+		super();
 	}
 	public String getMessage() {
 		return message;

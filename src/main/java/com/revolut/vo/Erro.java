@@ -2,15 +2,27 @@ package com.revolut.vo;
 
 import java.util.ArrayList;
 import java.util.List;
-//@JsonInclude(JsonInclude.Include.NON_NULL)
 public class Erro {
-	  private Integer httpStatus;
+
+	private Integer errorCode;
       private String message;
-      private List<FieldError> fieldErrors;
+      private List<FieldError> fieldErrors = new ArrayList<FieldError>();
       
+      public static final int ERROR_CODE_INSUFFICIENT_FUNDS = 10;
+      public static final int ERROR_CODE_SAME_ACCT_TRANSF = 11;
+      public static final int ERROR_CODE_INVALID_PARAM = 12;
+      public static final int ERROR_CODE_ACCOUNT_NOT_FOUND = 13;
+      public static final String ERROR_MSG_VALIDATION_ERROR = "Parameter validation error.";
+      public static final String ERROR_MSG_ACCOUNT_NOT_FOUND = "Account {0} not found.";
+      public static final String ERROR_MSG_BALANCE_IS_NOT_SUFFICIENT = "Balance is not sufficient: ";
+      public static final String ERROR_MSG_INVALID_TRANSFERECES_TO_THE_SAME_ACCOUNT = "Invalid transfereces to the same account.";
       
-	public Erro(Integer status, String message) {
-	    this.setHttpStatus(status);
+      public Erro() {
+    	  super();
+      }
+      
+	public Erro(Integer errorCode, String message) {
+	    this.errorCode = errorCode;
 	    this.message = message;
 	}
       
@@ -28,16 +40,16 @@ public class Erro {
 	}
 
     public void addFieldError(String path, String message) {
-    	if(fieldErrors == null) fieldErrors = new ArrayList<FieldError>();
         FieldError error = new FieldError(path, message);
         fieldErrors.add(error);
     }
 
-	public Integer getHttpStatus() {
-		return httpStatus;
+	public Integer getErrorCode() {
+		return errorCode;
 	}
 
-	public void setHttpStatus(Integer httpStatus) {
-		this.httpStatus = httpStatus;
+	public void setErrorCode(Integer errorCode) {
+		this.errorCode = errorCode;
 	}
+
 }
